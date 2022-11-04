@@ -5,30 +5,7 @@ on:
 
 # Based on https://github.com/Grokmoo/sulis/blob/master/.github/workflows/release.yml
 jobs:
-  create_release:
-    name: Create Release
-    runs-on: ubuntu-latest
-    steps:
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: ${{ github.ref }}
-          draft: false
-          prerelease: false
-      - name: Output Release URL
-        run: echo "${{ steps.create_release.outputs.upload_url }}" > release_url.txt
-      - name: Publish Release URL
-        uses: actions/upload-artifact@v1
-        with:
-          name: release_url
-          path: release_url.txt
-
   build:
-    needs: [ create_release ]
     name: build ${{ matrix.target }}
     runs-on: ubuntu-latest
     strategy:
@@ -36,9 +13,11 @@ jobs:
       matrix:
         include:
           - target: x86_64-pc-windows-gnu
+            name: "win64"
             extension: ".exe"
             archive: zip
           - target: x86_64-unknown-linux-musl
+            name: "linux64"
             extension: ""
             archive: tar.gz tar.xz
     
@@ -61,22 +40,8 @@ jobs:
           cp target/${{ matrix.target }}/release/main${{ matrix.extension }} fioravanti/fioravanti${{ matrix.extension }}
           git archive HEAD --prefix=fioravanti/ --format=zip -o fioravanti-${{ steps.get_version.outputs.VERSION }}-${{ matrix.name }}.zip
           zip -u fioravanti-${{ steps.get_version.outputs.VERSION }}-${{ matrix.name }}.zip fioravanti/fioravanti${{ matrix.extension }}
-      - name: Load Release URL
-        uses: actions/download-artifact@v1
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
         with:
-          name: release_url
-      - name: Get Release URL
-        id: get_release_url
-        run: |
-          value=`cat release_url/release_url.txt`
-          echo ::set-output name=upload_url::$value
-      - name: Upload Asset
-        id: upload_asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.get_release_url.outputs.upload_url }}
-          asset_path: ./fioravanti-${{ steps.get_version.outputs.VERSION }}-${{ matrix.name }}.zip
-          asset_name: fioravanti-${{ steps.get_version.outputs.VERSION }}-${{ matrix.name }}.zip
-          asset_content_type: application/zip
+          path: ./fioravanti-${{ steps.get_version.outputs.VERSION }}-${{ matrix.name }}.zip
+          name: fioravanti-${{ steps.get_version.outputs.VERSION }}-${{ matrix.name }}.zip
