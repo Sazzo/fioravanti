@@ -1,45 +1,30 @@
 on:
-  push
+  release:
+    types: [created]
 
-# Based on https://github.com/Grokmoo/sulis/blob/master/.github/workflows/release.yml
 jobs:
-  build:
-    name: build ${{ matrix.target }}
+  release:
+    name: release ${{ matrix.target }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         include:
           - target: x86_64-pc-windows-gnu
-            name: "win64"
-            extension: ".exe"
             archive: zip
           - target: x86_64-unknown-linux-musl
-            name: "linux64"
-            extension: ""
             archive: tar.gz tar.xz
-    
+          - target: x86_64-apple-darwin
+            archive: zip
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
-      - name: Get the version
-        id: get_version
-        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
-      - uses: actions/checkout@master
-      - name: Build
+      - name: Install ALSA Dev
         run: |
-          docker build -t fioravanti-x86_64-unknown-linux-gnu -f .github/Dockerfile-linux-release .
-          cargo install cross
-          cross build --release --target ${{ matrix.target }}
-          mkdir fioravanti/
-          cp target/${{ matrix.target }}/release/main${{ matrix.extension }} fioravanti/fioravanti${{ matrix.extension }}
-          git archive HEAD --prefix=fioravanti/ --format=zip -o fioravanti-${{ steps.get_version.outputs.VERSION }}-${{ matrix.name }}.zip
-          zip -u fioravanti-${{ steps.get_version.outputs.VERSION }}-${{ matrix.name }}.zip fioravanti/fioravanti${{ matrix.extension }}
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v3
-        with:
-          path: ./fioravanti-${{ steps.get_version.outputs.VERSION }}-${{ matrix.name }}.zip
-          name: fioravanti-${{ steps.get_version.outputs.VERSION }}-${{ matrix.name }}.zip
+          sudo apt-get update
+          sudo apt-get install libasound2-dev libudev-dev alsa alsa-tools alsa-base
+      - uses: actions/checkout@master
+      - name: Compile and release
+        uses: rust-build/rust-build.action@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUSTTARGET: ${{ matrix.target }}
+          ARCHIVE_TYPES: ${{ matrix.archive }}
