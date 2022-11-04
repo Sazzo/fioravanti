@@ -32,13 +32,16 @@ fn main() {
             let selected_sfx = prompt_select_sfx(&sfx_list);
             let selected_sfx_file = &sfx_map[&sfx_list[selected_sfx]];
 
-            let progress_bar = ProgressBar::new(300);
+            /* let progress_bar = ProgressBar::new(300);
             progress_bar.set_style(
                 ProgressStyle::default_bar()
                     .template("{spinner:.green} {msg}").unwrap()
                     .progress_chars("##-"),
             );
-            progress_bar.set_message(format!("Tocando {}", selected_sfx_file));
+            progress_bar.set_message(format!("Tocando {}", selected_sfx_file)); */
+
+            // TODO: Add SFX remaining duration.
+            println!("...Tocando {0} do SFX {1}. Agurdando terminar...", selected_sfx_file, selected_sfx)
             play_sfx(selected_sfx_file);
             progress_bar.finish();
         }
