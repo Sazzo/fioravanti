@@ -20,8 +20,8 @@ jobs:
       - name: Install ALSA Dev
         run: |
           sudo apt-get update
-          sudo apt-get install libasound2-dev
-          sudo apt-get install libudev-dev
+          sudo apt-get install libasound2-dev libudev-dev alsa-tools alsa-base
+          sudo apt-get install 
       - uses: actions/checkout@master
       - name: Compile and release
         uses: rust-build/rust-build.action@latest
