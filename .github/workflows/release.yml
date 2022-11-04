@@ -17,6 +17,10 @@ jobs:
           - target: x86_64-apple-darwin
             archive: zip
     steps:
+      - name: Install ALSA Dev
+        run: |
+          sudo apt-get update
+          sudo apt-get install libasound2-dev
       - uses: actions/checkout@master
       - name: Compile and release
         uses: rust-build/rust-build.action@latest
