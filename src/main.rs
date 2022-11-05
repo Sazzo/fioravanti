@@ -5,7 +5,6 @@ use std::collections::HashMap;
 use std::fs::File;
 
 use clap::Parser;
-use indicatif::{ProgressBar, ProgressStyle};
 use messages::*;
 use prompts::*;
 use rodio::{Decoder, OutputStream, Sink};
@@ -41,9 +40,10 @@ fn main() {
             progress_bar.set_message(format!("Tocando {}", selected_sfx_file)); */
 
             // TODO: Add SFX remaining duration.
-            println!("...Tocando {0} do SFX {1}. Agurdando terminar...", selected_sfx_file, selected_sfx)
+            println!("...Tocando {0} do SFX {1}. Agurdando terminar...", selected_sfx_file, selected_sfx);
             play_sfx(selected_sfx_file);
-            progress_bar.finish();
+            
+            // progress_bar.finish();
         }
     }
 }
