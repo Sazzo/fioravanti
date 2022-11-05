@@ -56,7 +56,8 @@ jobs:
           cargo install cross
           cross build --release --target ${{ matrix.target }}
           mkdir fioravanti/
-          cp target/${{ matrix.target }}/release/main${{ matrix.extension }} fioravanti/fioravanti${{ matrix.extension }}
+          ls target/
+          cp target/${{ matrix.target }}/release/fioravanti${{ matrix.extension }} fioravanti/fioravanti${{ matrix.extension }}
           git archive HEAD --prefix=fioravanti/ --format=zip -o fioravanti-${{ steps.get_version.outputs.VERSION }}-${{ matrix.name }}.zip
           zip -u fioravanti-${{ steps.get_version.outputs.VERSION }}-${{ matrix.name }}.zip fioravanti/fioravanti${{ matrix.extension }}
       - name: Load Release URL
