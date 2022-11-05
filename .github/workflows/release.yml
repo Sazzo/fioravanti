@@ -59,7 +59,7 @@ jobs:
           ls target/
           cp target/${{ matrix.target }}/release/fioravanti${{ matrix.extension }} fioravanti/fioravanti${{ matrix.extension }}
           git archive HEAD --prefix=fioravanti/ --format=zip -o fioravanti-${{ steps.get_version.outputs.VERSION }}-${{ matrix.name }}.zip
-          zip -u fioravanti-${{ steps.get_version.outputs.VERSION }}-${{ matrix.name }}.zip fioravanti/fioravanti${{ matrix.extension }}
+          zip -u fioravanti-${{ steps.get_version.outputs.VERSION }}-${{ matrix.target }}.zip fioravanti/fioravanti${{ matrix.extension }}
       - name: Load Release URL
         uses: actions/download-artifact@v1
         with:
@@ -76,6 +76,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.get_release_url.outputs.upload_url }}
-          asset_path: ./fioravanti-${{ steps.get_version.outputs.VERSION }}-${{ matrix.name }}.zip
-          asset_name: fioravanti-${{ steps.get_version.outputs.VERSION }}-${{ matrix.name }}.zip
+          asset_path: ./fioravanti-${{ steps.get_version.outputs.VERSION }}-${{ matrix.target }}.zip
+          asset_name: fioravanti-${{ steps.get_version.outputs.VERSION }}-${{ matrix.target }}.zip
           asset_content_type: application/zip
