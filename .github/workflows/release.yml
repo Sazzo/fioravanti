@@ -1,6 +1,7 @@
 on:
-  release:
-    types: [created]
+  push:
+    tags:
+      - "*"
 
 # Based on https://github.com/Grokmoo/sulis/blob/master/.github/workflows/release.yml
 jobs:
