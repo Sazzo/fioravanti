@@ -1,13 +1,13 @@
 mod messages;
 mod prompts;
 
-use std::collections::HashMap;
 use std::fs::File;
 
 use clap::Parser;
 use messages::*;
 use prompts::*;
 use rodio::{Decoder, OutputStream, Sink};
+use serde_json::Map;
 
 #[derive(Parser, Debug)]
 struct CliArgs {
@@ -24,7 +24,8 @@ fn main() {
 
     let sfx_list_file =
         std::fs::read_to_string("sounds.json").expect("Oops, sounds.json not found!");
-    let sfx_map: HashMap<String, String> = serde_json::from_str(&sfx_list_file).unwrap();
+    let sfx_map: Map<String, serde_json::Value> = serde_json::from_str(&sfx_list_file).unwrap();
+    println!("{:?}", sfx_map);
     if args.sfx.is_none() {
         let sfx_list: Vec<String> = sfx_map.keys().map(|s| s.to_string()).collect();
         loop {
@@ -41,7 +42,7 @@ fn main() {
 
             // TODO: Add SFX remaining duration.
             println!("...Tocando {0} do SFX {1}. Agurdando terminar...", selected_sfx_file, selected_sfx);
-            play_sfx(selected_sfx_file);
+            play_sfx(&selected_sfx_file.as_str().unwrap());
             
             // progress_bar.finish();
         }
