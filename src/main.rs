@@ -27,6 +27,7 @@ fn main() {
     let sfx_map: Map<String, serde_json::Value> = serde_json::from_str(&sfx_list_file).unwrap();
     if args.sfx.is_none() {
         let sfx_list: Vec<String> = sfx_map.keys().map(|s| s.to_string()).collect();
+
         loop {
             let selected_sfx = prompt_select_sfx(&sfx_list);
             let selected_sfx_file = &sfx_map[&sfx_list[selected_sfx]];
@@ -40,9 +41,13 @@ fn main() {
             progress_bar.set_message(format!("Tocando {}", selected_sfx_file)); */
 
             // TODO: Add SFX remaining duration.
-            println!("...Tocando {0} do SFX {1}. Agurdando terminar...", selected_sfx_file, selected_sfx);
+            println!(
+                "...Tocando {0} do SFX {1}. Aguarde terminar ou use CTRL+C para terminar.",
+                selected_sfx_file, selected_sfx
+            );
+
             play_sfx(&selected_sfx_file.as_str().unwrap());
-            
+
             // progress_bar.finish();
         }
     }
@@ -55,7 +60,8 @@ fn play_sfx(sfx_file: &str) {
     let loaded_sfx_file =
         File::open(format!("sounds/{}", sfx_file)).expect("Oops, sounds file not found!");
     let sfx_source = Decoder::new(loaded_sfx_file).unwrap();
-    
+
     sink.append(sfx_source);
+
     sink.sleep_until_end();
 }
